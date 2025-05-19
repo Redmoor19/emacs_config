@@ -75,7 +75,7 @@
 (use-package corfu-popupinfo
   :load-path "~/.emacs.d/lisp/corfu/"
   :after corfu
-  :config (corfu-popupinfo-mode 1) (setq corfu-popupinfo-delay (cons nil 1.0)))
+  :config (corfu-popupinfo-mode 1) (setq corfu-popupinfo-delay (cons 0.5 1.0)))
 (use-package emacs
   :custom
   (tab-always-indent 'complete)
