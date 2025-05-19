@@ -1,0 +1,3 @@
+[submodule "lsp-tailwindcss"]
+	path = lsp-tailwindcss
+	url = git@github.com:merrickluo/lsp-tailwindcss.git
