@@ -234,9 +234,56 @@ Required for better LSP docs rendering
 (setq-default web-mode-code-indent-offset 2)
 
 (use-package jtsx
+  :ensure t
+  :mode (("\\.jsx?\\'" . jtsx-jsx-mode)
+         ("\\.tsx\\'" . jtsx-tsx-mode)
+         ("\\.ts\\'" . jtsx-typescript-mode))
+  :commands jtsx-install-treesit-language
+  :hook ((jtsx-jsx-mode . hs-minor-mode)
+         (jtsx-tsx-mode . hs-minor-mode)
+         (jtsx-typescript-mode . hs-minor-mode))
+  ;; :custom
+  ;; Optional customizations
+  ;; (js-indent-level 2)
+  ;; (typescript-ts-mode-indent-offset 2)
+  ;; (jtsx-switch-indent-offset 0)
+  ;; (jtsx-indent-statement-block-regarding-standalone-parent nil)
+  ;; (jtsx-jsx-element-move-allow-step-out t)
+  ;; (jtsx-enable-jsx-electric-closing-element t)
+  ;; (jtsx-enable-electric-open-newline-between-jsx-element-tags t)
+  ;; (jtsx-enable-jsx-element-tags-auto-sync nil)
+  ;; (jtsx-enable-all-syntax-highlighting-features t)
   :config
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . jtsx-tsx-mode))
-  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . jtsx-jsx-mode)))
+  (defun jtsx-bind-keys-to-mode-map (mode-map)
+    "Bind keys to MODE-MAP."
+    (define-key mode-map (kbd "C-c C-j") 'jtsx-jump-jsx-element-tag-dwim)
+    (define-key mode-map (kbd "C-c j o") 'jtsx-jump-jsx-opening-tag)
+    (define-key mode-map (kbd "C-c j c") 'jtsx-jump-jsx-closing-tag)
+    (define-key mode-map (kbd "C-c j r") 'jtsx-rename-jsx-element)
+    (define-key mode-map (kbd "C-c <down>") 'jtsx-move-jsx-element-tag-forward)
+    (define-key mode-map (kbd "C-c <up>") 'jtsx-move-jsx-element-tag-backward)
+    (define-key mode-map (kbd "C-c C-<down>") 'jtsx-move-jsx-element-forward)
+    (define-key mode-map (kbd "C-c C-<up>") 'jtsx-move-jsx-element-backward)
+    (define-key mode-map (kbd "C-c C-S-<down>") 'jtsx-move-jsx-element-step-in-forward)
+    (define-key mode-map (kbd "C-c C-S-<up>") 'jtsx-move-jsx-element-step-in-backward)
+    (define-key mode-map (kbd "C-c j w") 'jtsx-wrap-in-jsx-element)
+    (define-key mode-map (kbd "C-c j u") 'jtsx-unwrap-jsx)
+    (define-key mode-map (kbd "C-c j d n") 'jtsx-delete-jsx-node)
+    (define-key mode-map (kbd "C-c j d a") 'jtsx-delete-jsx-attribute)
+    (define-key mode-map (kbd "C-c j t") 'jtsx-toggle-jsx-attributes-orientation)
+    (define-key mode-map (kbd "C-c j h") 'jtsx-rearrange-jsx-attributes-horizontally)
+    (define-key mode-map (kbd "C-c j v") 'jtsx-rearrange-jsx-attributes-vertically))
+    
+  (defun jtsx-bind-keys-to-jtsx-jsx-mode-map ()
+      (jtsx-bind-keys-to-mode-map jtsx-jsx-mode-map))
+
+  (defun jtsx-bind-keys-to-jtsx-tsx-mode-map ()
+      (jtsx-bind-keys-to-mode-map jtsx-tsx-mode-map))
+
+  (add-hook 'jtsx-jsx-mode-hook 'jtsx-bind-keys-to-jtsx-jsx-mode-map)
+  (add-hook 'jtsx-tsx-mode-hook 'jtsx-bind-keys-to-jtsx-tsx-mode-map)
+  :hook
+  (jtsx-tsx-mode . lsp-mode))
 
 (defun my/web-mode-hook ()
   "Hooks for Web mode."
@@ -332,6 +379,7 @@ Required for better LSP docs rendering
   (compilation-filter . user/ansi-colorize-buffer))
 #+end_src
 
+
 *** Increase line length to hide
 
 #+begin_src elisp
@@ -344,32 +392,22 @@ Required for better LSP docs rendering
 (setq compilation-scroll-output t)
 #+end_src
 
-*** Binds
-
-#+begin_src elisp
-(use-package
- emacs
- :bind
- ("<f8>" . recompile)
- ("<f9>" . project-compile))
-#+end_src
-
 *** Compilation regular expressions
 
 #+begin_src elisp
 (use-package compile
+  :custom
+  (compilation-max-output-line-length 5000)
+  (compilation-scroll-output t)
+  (compilation-buffer-name-function (lambda (_) (concat "*" compile-command "*")))
+  :bind
+  ("<f8>" . recompile)
+  ("<f9>" . project-compile)
   :config
-  (add-to-list
-   'compilation-error-regexp-alist-alist
-   '(biome-lint
-     "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s.*\s━+$" 1 2 3 2 1))
-  (add-to-list 'compilation-error-regexp-alist 'biome-lint)
-
-  (add-to-list
-   'compilation-error-regexp-alist-alist
-   '(tsc
-     "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s-\serror\s.*$" 1 2 3 2 1))
-  (add-to-list 'compilation-error-regexp-alist 'tsc))
+  (dolist (regex '((biome-lint "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s.*\s━+$" 1 2 3 2 1)
+                   (tsc "^\\(.*\\):\\([0-9]+\\):\\([0-9]+\\)\s-\serror\s.*$" 1 2 3 2 1)))
+    (add-to-list 'compilation-error-regexp-alist-alist regex)
+    (add-to-list 'compilation-error-regexp-alist-alist (car regex))))
 #+end_src
 
 ** Snippets

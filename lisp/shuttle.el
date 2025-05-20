@@ -30,7 +30,7 @@
         orig-result)))
   :init
   (setq lsp-keymap-prefix "C-c l")
-  :bind ("C-c j" . lsp-find-definition)
+  :bind ("M-." . lsp-find-definition)
   :custom
   (lsp-completion-provider :none)       ; Using Corfu as the provider
   (lsp-diagnostics-provider :flycheck)
@@ -70,12 +70,14 @@
   :init
   (global-corfu-mode)
   (setq corfu-auto t
-      corfu-auto-delay 0
+      corfu-auto-delay 1
       corfu-auto-prefix 3))
+
 (use-package corfu-popupinfo
   :load-path "~/.emacs.d/lisp/corfu/"
   :after corfu
   :config (corfu-popupinfo-mode 1) (setq corfu-popupinfo-delay (cons 0.5 1.0)))
+
 (use-package emacs
   :custom
   (tab-always-indent 'complete)
