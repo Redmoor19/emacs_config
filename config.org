@@ -697,7 +697,7 @@ Allows to restores layout after maximizing
 #+begin_src elisp
 (use-package auth-source
   :custom
-  (auth-sources '("~/.authinfo"))
+  (auth-sources '("~/.authinfo.gpg"))
   (auth-source-debug 'trivia)
   (epg-pinentry-mode 'loopback)
   :config
@@ -895,7 +895,7 @@ Turn off duplicating lines on execution
   (add-hook 'eshell-mode-hook #'eat-eshell-visual-command-mode))
 #+end_src
 
-* Tools
+* Tool
 ** Tramp
 
 #+begin_src elisp
@@ -1124,6 +1124,13 @@ Add file to gptl context
   (async-shell-command (buffer-substring (region-beginning) (region-end))))
 #+end_src
 
+** LLM commit
+#+begin_src elisp
+(use-package llm-commit
+  :ensure nil
+  :load-path "scripts"
+  :hook (git-commit-mode . llm-commit:generate))
+#+end_src
 * Unbinds
 ** C-z unbind
 #+begin_src elisp
