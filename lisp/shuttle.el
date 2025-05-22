@@ -34,8 +34,6 @@
   :custom
   (lsp-completion-provider :none)       ; Using Corfu as the provider
   (lsp-diagnostics-provider :flycheck)
-  :hook
-  (tsx-mode . lsp)
   :commands lsp)
 
 (use-package flycheck
